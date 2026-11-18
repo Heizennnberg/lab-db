@@ -1,53 +1,80 @@
--- 1. Курсы длиннее 30 часов: по убыванию часов, топ-3
-SELECT id, title, hours
+-- 1. Курсы длительностью более 30 часов
+SELECT *
 FROM courses
 WHERE hours > 30
 ORDER BY hours DESC
-LIMIT 3;
+LIMIT 5;
 
--- 2. Курсы вместе с преподавателями (INNER JOIN)
-SELECT c.title, t.full_name AS teacher
-FROM courses c
-INNER JOIN teachers t ON t.id = c.teacher_id;
+-- 2. Курсы вместе с преподавателями
+SELECT courses.title, teachers.full_name
+FROM courses
+INNER JOIN teachers
+ON courses.teacher_id = teachers.id;
 
--- 3. Курсы, на которые никто не записан (LEFT JOIN)
-SELECT c.id, c.title
-FROM courses c
-LEFT JOIN enrollments e ON e.course_id = c.id
-WHERE e.course_id IS NULL;
+-- 3. Курсы, на которые никто не записался
+SELECT courses.*
+FROM courses
+LEFT JOIN enrollments
+ON courses.id = enrollments.course_id
+WHERE enrollments.student_id IS NULL;
 
--- 4. Студент, курс, оценка (JOIN трёх таблиц)
-SELECT s.full_name AS student, c.title AS course, e.grade
-FROM enrollments e
-JOIN students s ON s.id = e.student_id
-JOIN courses c ON c.id = e.course_id
-ORDER BY s.full_name;
+-- 4. Студенты, курсы и оценки
+SELECT
+    students.full_name,
+    courses.title,
+    enrollments.grade
+FROM students
+JOIN enrollments
+ON students.id = enrollments.student_id
+JOIN courses
+ON courses.id = enrollments.course_id;
 
--- 5. Средняя оценка по курсам, только курсы со средней выше 70 (GROUP BY + HAVING)
-SELECT c.title, ROUND(AVG(e.grade), 1) AS avg_grade
-FROM courses c
-JOIN enrollments e ON e.course_id = c.id
-GROUP BY c.id, c.title
-HAVING AVG(e.grade) > 70;
+-- 5. Средняя оценка по курсам выше 70
+SELECT
+    courses.title,
+    AVG(enrollments.grade) AS average_grade
+FROM courses
+JOIN enrollments
+ON courses.id = enrollments.course_id
+GROUP BY courses.id, courses.title
+HAVING AVG(enrollments.grade) > 70;
 
--- 6. Студенты с оценкой выше средней по всем записям (подзапрос)
-SELECT DISTINCT s.full_name, e.grade
-FROM enrollments e
-JOIN students s ON s.id = e.student_id
-WHERE e.grade > (SELECT AVG(grade) FROM enrollments);
+-- 6. Студенты с оценкой выше общей средней
+SELECT DISTINCT students.full_name
+FROM students
+JOIN enrollments
+ON students.id = enrollments.student_id
+WHERE enrollments.grade >
+    (SELECT AVG(grade) FROM enrollments);
 
--- 7. UPDATE с условием: поставить оценку, где её ещё нет
+-- 7. Изменение оценки
 UPDATE enrollments
-SET grade = 80
-WHERE student_id = 3 AND course_id = 5 AND grade IS NULL;
+SET grade = 95
+WHERE student_id = 1 AND course_id = 1;
 
--- 8. DELETE с условием: удалить запись о записи на курс
+-- 8. Удаление записи
 DELETE FROM enrollments
-WHERE student_id = 4 AND course_id = 1;
+WHERE student_id = 4 AND course_id = 2;
 
--- 9. Транзакция: записать студента на курс и сразу поставить оценку
+-- 9. Транзакция
 BEGIN;
-INSERT INTO enrollments (student_id, course_id, grade)
-VALUES (5, 2, 88);
+
+INSERT INTO enrollments
+(student_id, course_id, enrolled_at, grade)
+VALUES (2, 3, CURRENT_DATE, NULL);
+
+UPDATE enrollments
+SET grade = 88
+WHERE student_id = 2 AND course_id = 3;
+
 COMMIT;
--- Если что-то пошло не так, вместо COMMIT выполняют ROLLBACK;
+
+-- 10. Создание индекса
+CREATE INDEX idx_courses_hours
+ON courses(hours);
+
+-- Проверка плана запроса
+EXPLAIN ANALYZE
+SELECT *
+FROM courses
+WHERE hours > 30;

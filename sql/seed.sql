@@ -1,30 +1,30 @@
-TRUNCATE enrollments, courses, students, teachers RESTART IDENTITY CASCADE;
+
+-- 1. Оқытушылар
 INSERT INTO teachers (full_name, email) VALUES
-  ('Айдар Нурланов', 'aidar@center.kz'),
-  ('Мария Ким', 'maria@center.kz'),
-  ('Ербол Садыков', 'erbol@center.kz'),
-  ('Алия Омарова', 'aliya@center.kz');
+('Азамат Нұрланов', 'azamat@mail.com'),
+('Айгүл Серікқызы', 'aigul@mail.com'),
+('Данияр Ермеков', 'daniyar@mail.com'),
+('Мадина Қасымова', 'madina@mail.com');
 
+-- 2. Студенттер
 INSERT INTO students (full_name, email, group_name) VALUES
-  ('Данияр Ахметов', 'daniyar@mail.kz', 'IT-21'),
-  ('Айгерим Бекова', 'aigerim@mail.kz', 'IT-21'),
-  ('Тимур Сейтов', 'timur@mail.kz', 'IT-22'),
-  ('Сабина Жумабаева', 'sabina@mail.kz', 'IT-22'),
-  ('Нурлан Ким', 'nurlan@mail.kz', 'IT-23');
+('Алихан Беков', 'ali@mail.com', 'IT-101'),
+('Аружан Сейтова', 'aru@mail.com', 'IT-101'),
+('Нұрсұлтан Әлиев', 'nur@mail.com', 'IT-102'),
+('Дана Мұратова', 'dana@mail.com', 'IT-102');
 
+-- 3. Курстар
 INSERT INTO courses (title, description, hours, teacher_id) VALUES
-  ('SQL для начинающих', 'Основы реляционных баз данных', 40, 1),
-  ('Node.js и REST API', 'Создание серверной части', 60, 2),
-  ('Python', 'Программирование на Python', 30, 3),
-  ('Веб-дизайн', 'Основы UI и верстки', 24, 4),
-  ('Алгоритмы', 'Базовые структуры данных', 50, 1);
+('PostgreSQL', 'Дерекқор негіздері', 40, 1),
+('JavaScript', 'JavaScript бағдарламалау', 35, 2),
+('Node.js', 'Backend әзірлеу', 45, 3),
+('HTML CSS', 'Web дизайн негіздері', 25, 4);
 
-INSERT INTO enrollments (student_id, course_id, enrolled_at, grade) VALUES
-  (1, 1, '2026-09-01', 85),
-  (1, 2, '2026-09-02', 72),
-  (2, 1, '2026-09-01', 90),
-  (2, 3, '2026-09-05', 65),
-  (3, 2, '2026-09-03', 78),
-  (3, 5, '2026-09-04', NULL),
-  (4, 1, '2026-09-06', 55),
-  (5, 3, '2026-09-07', 95);
+-- 4. Студенттердің курстарға жазылуы
+INSERT INTO enrollments
+(student_id, course_id, enrolled_at, grade) VALUES
+(1, 1, '2026-09-01', 85),
+(2, 1, '2026-09-02', 90),
+(3, 2, '2026-09-03', 75),
+(4, 2, '2026-09-04', 95),
+(1, 3, '2026-09-05', 80);
