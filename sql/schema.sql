@@ -30,6 +30,4 @@ CREATE TABLE enrollments (
   enrolled_at DATE NOT NULL DEFAULT CURRENT_DATE,
   grade INTEGER CHECK (grade BETWEEN 0 AND 100),
   PRIMARY KEY (student_id, course_id)
-);git add sql/schema.sql
-git commit -m "Add schema.sql"
-git push
+);
